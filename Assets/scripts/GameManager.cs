@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
     public Transform[] livesGameObject;
     public Transform bulletHolderTransform;
     public Canvas effectCanvas;
+    public GameObject mainMenuPanel;
     #endregion
 
     [Header("Prefabs")]
@@ -51,6 +52,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject enemyPrefab;
     [SerializeField] GameObject hostagePrefab;
     [SerializeField] GameObject comboPrefab;
+    [SerializeField] GameObject bloodPrefab;
     #endregion
 
     [Header("")]
@@ -74,7 +76,7 @@ public class GameManager : MonoBehaviour
     float fireInterval = 0.5f;
     float lastFired;
     GameObject comboSpawned;
-
+    bool ghostMode;
     #endregion
 
     [Header("")]
@@ -151,7 +153,20 @@ public class GameManager : MonoBehaviour
     public void TakeDamage()
     {
         //show damage effect;
-        DecreaseLife();
+        if (!ghostMode)
+        {
+            Destroy(Instantiate(bloodPrefab), 0.3f);
+            mainMenuPanel.GetComponent<Image>().enabled = true;
+            Invoke(nameof(DisableBloodEffect), 0.3f);
+            DecreaseLife();
+            ghostMode = true;
+        }
+    }
+
+    private void DisableBloodEffect()
+    {
+        mainMenuPanel.GetComponent<Image>().enabled = false;
+        ghostMode = false;
     }
 
     public Vector3 GetMoveAwayPos(int index)

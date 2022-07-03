@@ -8,9 +8,8 @@ public class HostageController : CharacterBase,ICharcterInteface
     {
         Instantiate(hitEffectPrefab, hitPosition, Quaternion.identity);
         GameManager.instance.DecreaseLife();
-        GameManager.instance.ClearSpawnIndex(spawnIndex);
         //Hurt effect
-        Destroy(this.gameObject);
+        PlayHurtMotion();
     }
     // Start is called before the first frame update
     void Start()

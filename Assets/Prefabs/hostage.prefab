@@ -116,3 +116,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnIndex: 0
   hitEffectPrefab: {fileID: 100004, guid: f95ff734540a0d749be6571b6cb5b37f, type: 3}
+  hurtSprite: {fileID: 21300000, guid: c13ad289197630e40a494dde751beede, type: 3}

@@ -45,7 +45,7 @@ public class UIManager : MonoBehaviour
             EnableDisableMusicBtns(soundBtn, 1f);
         }
 
-
+        GetHighScore();
     }
     void GetHighScore()
     {

@@ -8,8 +8,8 @@ public class ThugController : CharacterBase,ICharcterInteface
     {
         Instantiate(hitEffectPrefab, hitPosition, Quaternion.identity);
         GameManager.instance.AddScore(1);
-        GameManager.instance.ClearSpawnIndex(spawnIndex);
-        Destroy(this.gameObject);
+        PlayHurtMotion();
+        //Destroy(this.gameObject);
     }
     // Start is called before the first frame update
     void Start()

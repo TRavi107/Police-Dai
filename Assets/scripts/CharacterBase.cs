@@ -8,6 +8,7 @@ public class CharacterBase : MonoBehaviour
     public int spawnIndex;
     public GameObject hitEffectPrefab;
     protected bool inPosition;
+    public Sprite hurtSprite;
     IEnumerator Cour_MoveTowardsScreen(Vector3 position)
     {
         while(Vector3.Distance(transform.position,position) > 0.01)
@@ -42,7 +43,15 @@ public class CharacterBase : MonoBehaviour
     {
         GameManager.instance.ClearSpawnIndex(spawnIndex);
         Destroy(this.gameObject);
-    }
+        GameManager.instance.ClearSpawnIndex(spawnIndex);
 
+    }
+    public void PlayHurtMotion()
+    {
+        StopCoroutine(nameof(Cour_MoveTowardsScreen));
+        StopCoroutine(nameof(Cour_MoveAwayFromScreen));
+        GetComponent<SpriteRenderer>().sprite = hurtSprite;
+        Invoke(nameof(MoveAwayAction), 0.3f);
+    }
     public virtual void WaitAction() { }
 }
