@@ -10,10 +10,11 @@ public enum SoundType
     none,
     mainMenuSound,
     backgroundSound,
-    slashSound,
     uiSound,
     pauseSound,
-    explosion,
+    pistolShoot,
+    AkShoot,
+    ReloadShoot,
 }
 
 
@@ -25,13 +26,15 @@ public class soundManager : MonoBehaviour
 
     public List<AudioClip> uiSounds;
     public AudioClip pauseResumeSound;
-    public AudioClip explosionSound;
-    public float backGroundAudioVolume;
-    public float soundeffectVolume;
+    public AudioClip pistolShootAutdio;
+    public AudioClip AKShootAutdio;
+    public AudioClip reloadAutdio;
+    [HideInInspector]public float backGroundAudioVolume;
+    [HideInInspector]public float soundeffectVolume; 
+    public float OriginalbackGroundAudioVolume;
+    public float OriginalsoundeffectVolume;
 
-    private AudioSource UISoundSource;
     private AudioSource backGroundAudioSource;
-    private AudioSource slashAudioSource;
 
     private void Awake()
     {
@@ -81,58 +84,72 @@ public class soundManager : MonoBehaviour
 
     public void PlaySound(SoundType soundType)
     {
-        AudioClip clip;
+        GameObject audioSource=new();
+        AudioSource source= audioSource.AddComponent<AudioSource>();
+        
+        AudioClip clip=null;
+        AudioClip bgClip;
         int soundIndex;
         switch (soundType)
         {
             case SoundType.mainMenuSound:
                 soundIndex = Random.Range(0, mainMenuSound.Count);
-                clip = mainMenuSound[soundIndex];
+                bgClip = mainMenuSound[soundIndex];
                 if (backGroundAudioSource == null)
                 {
                     backGroundAudioSource = gameObject.AddComponent<AudioSource>();
                 }
-                backGroundAudioSource.clip = clip;
+                backGroundAudioSource.clip = bgClip;
                 backGroundAudioSource.loop = false;
+                backGroundAudioSource.volume = backGroundAudioVolume;
                 backGroundAudioSource.Play();
                 break;
             case SoundType.backgroundSound:
                 soundIndex = Random.Range(0, backGroundSound.Count);
-                clip = backGroundSound[soundIndex];
+                bgClip = backGroundSound[soundIndex];
                 if (backGroundAudioSource == null)
                 {
                     backGroundAudioSource = gameObject.AddComponent<AudioSource>();
                 }
-                backGroundAudioSource.clip = clip;
+                backGroundAudioSource.clip = bgClip;
                 backGroundAudioSource.loop = false;
+                backGroundAudioSource.volume = backGroundAudioVolume;
                 backGroundAudioSource.Play();
                 break;
 
             case SoundType.uiSound:
                 soundIndex = Random.Range(0, uiSounds.Count);
                 clip = uiSounds[soundIndex];
-                if (UISoundSource == null)
-                {
-                    UISoundSource = gameObject.AddComponent<AudioSource>();
-                }
-                UISoundSource.clip = clip;
-                UISoundSource.loop = false;
-                UISoundSource.Play();
+                
                 break;
             case SoundType.pauseSound:
                 clip = pauseResumeSound;
-                if (UISoundSource == null)
-                {
-                    UISoundSource = gameObject.AddComponent<AudioSource>();
-                }
-                UISoundSource.clip = clip;
-                UISoundSource.loop = false;
-                UISoundSource.Play();
                 break;
 
+            case SoundType.pistolShoot:
+                clip = pistolShootAutdio;
+                break;
+
+            case SoundType.AkShoot:
+                clip = AKShootAutdio;
+                break;
+
+            case SoundType.ReloadShoot:
+                clip = reloadAutdio;
+                break;
             default:
                 break;
         }
+        if (clip != null)
+        {
+            source.clip = clip;
+            source.loop = false;
+            source.volume = soundeffectVolume;
+            source.Play();
+            Destroy(audioSource, clip.length + 0.1f);
+            return;
+        }
+        Destroy(audioSource);
     }
 
     public void MusicVolumeChanged(float volume)
@@ -140,14 +157,12 @@ public class soundManager : MonoBehaviour
         if(backGroundAudioSource != null)
         {
             backGroundAudioSource.volume = volume;
+            SaveMusicVoulme(volume);
         }
     }
     public void SoundVolumeChanged(float volume)
     {
-        if (slashAudioSource != null)
-        {
-            slashAudioSource.volume = volume;
-        }
+        SaveSoundVoulme(volume);
     }
 
     public void SaveMusicVoulme(float volume)

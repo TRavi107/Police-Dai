@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using RamailoGames;
+using FirstGearGames.SmoothCameraShaker;
 
 [System.Serializable]
 public class SpawnPos
@@ -15,6 +16,8 @@ public class SpawnPos
 
 public class GameManager : MonoBehaviour
 {
+    public ShakeData shakeData;
+    public ShakeData MinishakeData;
     [Header("UIS")]
     #region UIS
 
@@ -23,6 +26,7 @@ public class GameManager : MonoBehaviour
     public TMP_Text scoreText;
     public TMP_Text gamePlayhighscoreText;
     public Image bulletImage;
+    public Image HealthImage;
 
     #endregion
 
@@ -41,7 +45,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Transforms")]
     #region Transforms
-    public Transform[] livesGameObject;
+    public Transform livesHoldertransform;
     public Transform bulletHolderTransform;
     public Canvas effectCanvas;
     public GameObject mainMenuPanel;
@@ -53,6 +57,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject hostagePrefab;
     [SerializeField] GameObject comboPrefab;
     [SerializeField] GameObject bloodPrefab;
+    [SerializeField] GameObject hitEffectPrefab;
+    [SerializeField] GameObject[] PowerUpsPrefab;
     #endregion
 
     [Header("")]
@@ -60,9 +66,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] List<SpawnPos> spawnPos;
     #endregion
 
-    [Header("")]
+    [Header("Private Serialized Fields")]
     #region Private Serialized Fields
     [SerializeField] int score;
+    [SerializeField] float enemySpawnDuration;
+    [SerializeField] float LevelIncreaseDuration;
+    [Range(1,100)]
+    [SerializeField] int powerUpSpawnChance;
 
     #endregion
 
@@ -77,11 +87,14 @@ public class GameManager : MonoBehaviour
     float lastFired;
     GameObject comboSpawned;
     bool ghostMode;
+    float lastLevelUpdated;
     #endregion
 
     [Header("")]
     #region Public Fields
     public int bulletAmount;
+    public float enemyWaitBeforeShootDuration;
+    public float MaxcenemyWaitBeforeShootDuration;
     #endregion
 
     #region MonoBehaviour Functions
@@ -93,9 +106,13 @@ public class GameManager : MonoBehaviour
         ScoreAPI.GameStart((bool s) => {
         });
         startTime = Time.time;
-        StartCoroutine(nameof(spawnCharacters));
-        lives = 3;
+        StartCoroutine(nameof(SpawnCharacters));
         bulletAmount = 7;
+        for (int i = 0; i < 3; i++)
+        {
+            AddHealth();
+        }
+        PauseGame();
     }
 
     // Update is called once per frame
@@ -115,6 +132,16 @@ public class GameManager : MonoBehaviour
                             hitCharacter.TakeHit(hit.point);
                             lastFired = Time.time;
                             DecreaseBullet();
+                            soundManager.instance.PlaySound(SoundType.pistolShoot);
+                        }
+                        else if (hit.collider.CompareTag("PowerUp"))
+                        {
+                            lastFired = Time.time;
+                            DecreaseBullet();
+                            soundManager.instance.PlaySound(SoundType.pistolShoot);
+                            AddHealth();
+                            Instantiate(hitEffectPrefab, hit.point, Quaternion.identity);
+                            Destroy(hit.collider.gameObject,0.1f);
                         }
                     }
                 }
@@ -124,6 +151,12 @@ public class GameManager : MonoBehaviour
                     //Tung wala sound effects
                 }
                 
+            }
+
+            if(UIManager.instance.activeUIPanel.uiPanelType == UIPanelType.howToplay)
+            {
+                UIManager.instance.SwitchCanvas(UIPanelType.mainGame);
+                ResumeGame();
             }
         }
     }
@@ -143,6 +176,7 @@ public class GameManager : MonoBehaviour
         {
             Instantiate(bulletImage, bulletHolderTransform);
         }
+        soundManager.instance.PlaySound(SoundType.ReloadShoot);
     }
 
     public void ClearSpawnIndex(int index)
@@ -159,6 +193,7 @@ public class GameManager : MonoBehaviour
             mainMenuPanel.GetComponent<Image>().enabled = true;
             Invoke(nameof(DisableBloodEffect), 0.3f);
             DecreaseLife();
+            Camera.main.GetComponent<CameraShaker>().Shake(shakeData);
             ghostMode = true;
         }
     }
@@ -176,13 +211,15 @@ public class GameManager : MonoBehaviour
 
     public void DecreaseLife()
     {
-        Destroy(livesGameObject[lives - 1].gameObject);
         lives--;
         if (lives <= 0)
         {
             Debug.Log("Game Over");
             GameOver();
+            return;
         }
+        Destroy(livesHoldertransform.GetChild(0).gameObject);
+
     }
     public void SlowTime(float amount,float duration)
     {
@@ -191,6 +228,7 @@ public class GameManager : MonoBehaviour
     }
     public void PauseGame()
     {
+        DisableCombo();
         //UIManager.instance.DisableCombo();
         //setHighScore(pausehighscoreText);
         //int min = (int)gameTimer / 60;
@@ -211,13 +249,29 @@ public class GameManager : MonoBehaviour
         score += amount ;
         scoreText.text = score.ToString();
         setHighScore(gamePlayhighscoreText);
+        if (Time.time - lastLevelUpdated > LevelIncreaseDuration)
+        {
+            lastLevelUpdated = Time.time;
+            enemyWaitBeforeShootDuration -= 0.1f;
+            if (enemyWaitBeforeShootDuration <= MaxcenemyWaitBeforeShootDuration)
+                enemyWaitBeforeShootDuration = MaxcenemyWaitBeforeShootDuration;
+        }
     }
 
     #endregion
 
     #region Private Functions
 
-    private void ShowReloadText()
+    void AddHealth()
+    {
+        if (lives < 3)
+        {
+            Instantiate(HealthImage, livesHoldertransform);
+            lives++;
+        }
+    }
+
+    void ShowReloadText()
     {
         StopCoroutine("AutoDisableCombo");
         if (comboSpawned == null)
@@ -250,6 +304,7 @@ public class GameManager : MonoBehaviour
         if (bulletAmount <= 0)
             bulletAmount = 0;
         Destroy(bulletHolderTransform.GetChild(0).gameObject);
+        //Camera.main.GetComponent<CameraShaker>().Shake(MinishakeData);
     }
     
     void GameOver()
@@ -308,17 +363,32 @@ public class GameManager : MonoBehaviour
 
     #region Coroutines
 
-    IEnumerator spawnCharacters()
+    IEnumerator SpawnCharacters()
     {
         while (true)
         {
-
-            int index = Random.Range(0, 3);
             int spawnIndex = Random.Range(0, spawnPos.Count);
+
+            
             if (!spawnPos[spawnIndex].isSpawned)
             {
+                int index = Random.Range(0, 3);
+
+                if (Random.Range(0, 100) < powerUpSpawnChance)
+                {
+                    int powerUpspawnIndex = Random.Range(0, PowerUpsPrefab.Length);
+                    GameObject powerupTemp =Instantiate(PowerUpsPrefab[powerUpspawnIndex],
+                        new( 
+                        spawnPos[spawnIndex].final_position.position.x,
+                        spawnPos[spawnIndex].final_position.position.y+0.4f
+                        ), 
+                        Quaternion.identity);
+
+                    powerupTemp.GetComponent<PowerUpController>().spawnIndex = spawnIndex;
+                    Destroy(powerupTemp, 2);
+                }
                 //Enemy
-                if (index == 0 || index==1)
+                else if (index == 0 || index==1)
                 {
                     GameObject tempCharacter = Instantiate(enemyPrefab, spawnPos[spawnIndex].spawn_position.position, Quaternion.identity);
                     tempCharacter.GetComponent<ThugController>().spawnIndex = spawnIndex;
@@ -341,7 +411,7 @@ public class GameManager : MonoBehaviour
                 }
                 spawnPos[spawnIndex].isSpawned = true;
                 objectCount++;
-                yield return new WaitForSeconds(1);
+                yield return new WaitForSeconds(enemySpawnDuration);
 
             }
             else

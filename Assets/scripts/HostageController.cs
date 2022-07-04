@@ -27,8 +27,6 @@ public class HostageController : CharacterBase,ICharcterInteface
     {
         //move awaky;
         MoveAwayFromScreen(GameManager.instance.GetMoveAwayPos(spawnIndex));
-        Debug.Log("move awaky");
     }
     
-
 }

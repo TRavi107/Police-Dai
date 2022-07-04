@@ -117,3 +117,4 @@ MonoBehaviour:
   spawnIndex: 0
   hitEffectPrefab: {fileID: 100004, guid: f95ff734540a0d749be6571b6cb5b37f, type: 3}
   hurtSprite: {fileID: 21300000, guid: d6f87cc86156236418e03bdebab90e01, type: 3}
+  ShootSprite: {fileID: 21300000, guid: ffad4fe2812faec4b8246c93573beb32, type: 3}

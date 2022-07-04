@@ -80,7 +80,7 @@ public class UIManager : MonoBehaviour
         {
             EnableDisableMusicBtns(musicBtn, 1f);
 
-            soundManager.instance.MusicVolumeChanged(soundManager.instance.backGroundAudioVolume);
+            soundManager.instance.MusicVolumeChanged(soundManager.instance.OriginalbackGroundAudioVolume);
         }
     }
     public void OnSoundBTNClickded()
@@ -96,7 +96,7 @@ public class UIManager : MonoBehaviour
         {
             EnableDisableMusicBtns(soundBtn, 1f);
 
-            soundManager.instance.SoundVolumeChanged(soundManager.instance.backGroundAudioVolume);
+            soundManager.instance.SoundVolumeChanged(soundManager.instance.OriginalbackGroundAudioVolume);
         }
     }
 

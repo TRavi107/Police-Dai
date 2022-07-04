@@ -16,7 +16,7 @@ public class CharacterBase : MonoBehaviour
             transform.position = Vector3.MoveTowards(transform.position, position, 5 * Time.deltaTime);
             yield return null;
         }
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(GameManager.instance.enemyWaitBeforeShootDuration);
         WaitAction();
     }
     IEnumerator Cour_MoveAwayFromScreen(Vector3 position)
@@ -26,7 +26,7 @@ public class CharacterBase : MonoBehaviour
             transform.position = Vector3.MoveTowards(transform.position, position, 5 * Time.deltaTime);
             yield return null;
         }
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(GameManager.instance.enemyWaitBeforeShootDuration);
         MoveAwayAction();
     }
 
@@ -41,7 +41,7 @@ public class CharacterBase : MonoBehaviour
     }
     public void MoveAwayAction()
     {
-        GameManager.instance.ClearSpawnIndex(spawnIndex);
+        //GameManager.instance.ClearSpawnIndex(spawnIndex);
         Destroy(this.gameObject);
         GameManager.instance.ClearSpawnIndex(spawnIndex);
 
@@ -51,7 +51,7 @@ public class CharacterBase : MonoBehaviour
         StopCoroutine(nameof(Cour_MoveTowardsScreen));
         StopCoroutine(nameof(Cour_MoveAwayFromScreen));
         GetComponent<SpriteRenderer>().sprite = hurtSprite;
-        Invoke(nameof(MoveAwayAction), 0.3f);
+        Invoke(nameof(MoveAwayAction), 0.2f);
     }
     public virtual void WaitAction() { }
 }

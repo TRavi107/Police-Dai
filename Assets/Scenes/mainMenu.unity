@@ -306,15 +306,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainMenuSound:
-  - {fileID: 8300000, guid: 45676d443682f03439d6b1f6f8a0b784, type: 3}
+  - {fileID: 8300000, guid: c2432f13bb5b1d841bac5f51349abf5a, type: 3}
   backGroundSound:
-  - {fileID: 8300000, guid: 45676d443682f03439d6b1f6f8a0b784, type: 3}
+  - {fileID: 8300000, guid: c2432f13bb5b1d841bac5f51349abf5a, type: 3}
   uiSounds:
   - {fileID: 8300000, guid: 2eec827de3fbbba4180d291f9258473b, type: 3}
   pauseResumeSound: {fileID: 8300000, guid: b462d6e6250023b4c895f5e3fac55e9b, type: 3}
-  explosionSound: {fileID: 0}
+  pistolShootAutdio: {fileID: 8300000, guid: a164be6959b4be94d9880de5a97a7fc7, type: 3}
+  AKShootAutdio: {fileID: 8300000, guid: 562c5c91bb5826a4695cae642311537a, type: 3}
+  reloadAutdio: {fileID: 8300000, guid: ed9c2aa63ca0e9d438233f241c1d785c, type: 3}
   backGroundAudioVolume: 0.5
   soundeffectVolume: 0.5
+  OriginalbackGroundAudioVolume: 0.5
+  OriginalsoundeffectVolume: 0.5
 --- !u!1 &689425100
 GameObject:
   m_ObjectHideFlags: 0
