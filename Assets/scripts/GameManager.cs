@@ -120,39 +120,35 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            if (Time.time - lastFired > fireInterval)
-            {
-                if (bulletAmount > 0){
-                    RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-                    if (hit.collider != null)
+            
+            if (bulletAmount > 0){
+                RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+                if (hit.collider != null)
+                {
+                    ICharcterInteface hitCharacter = hit.collider.gameObject.GetComponent<ICharcterInteface>();
+                    if (hitCharacter != null)
                     {
-                        ICharcterInteface hitCharacter = hit.collider.gameObject.GetComponent<ICharcterInteface>();
-                        if (hitCharacter != null)
-                        {
-                            hitCharacter.TakeHit(hit.point);
-                            lastFired = Time.time;
-                            DecreaseBullet();
-                            soundManager.instance.PlaySound(SoundType.pistolShoot);
-                        }
-                        else if (hit.collider.CompareTag("PowerUp"))
-                        {
-                            lastFired = Time.time;
-                            DecreaseBullet();
-                            soundManager.instance.PlaySound(SoundType.pistolShoot);
-                            AddHealth();
-                            Instantiate(hitEffectPrefab, hit.point, Quaternion.identity);
-                            Destroy(hit.collider.gameObject,0.1f);
-                        }
+                        hitCharacter.TakeHit(hit.point);
+                        lastFired = Time.time;
+                        DecreaseBullet();
+                        soundManager.instance.PlaySound(SoundType.pistolShoot);
+                    }
+                    else if (hit.collider.CompareTag("PowerUp"))
+                    {
+                        lastFired = Time.time;
+                        DecreaseBullet();
+                        soundManager.instance.PlaySound(SoundType.pistolShoot);
+                        AddHealth();
+                        Instantiate(hitEffectPrefab, hit.point, Quaternion.identity);
+                        Destroy(hit.collider.gameObject,0.1f);
                     }
                 }
-                else
-                {
-                    ShowReloadText();
-                    //Tung wala sound effects
-                }
-                
             }
-
+            else
+            {
+                ShowReloadText();
+                //Tung wala sound effects
+            }
             if(UIManager.instance.activeUIPanel.uiPanelType == UIPanelType.howToplay)
             {
                 UIManager.instance.SwitchCanvas(UIPanelType.mainGame);
