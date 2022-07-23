@@ -95,6 +95,7 @@ public class GameManager : MonoBehaviour
     public int bulletAmount;
     public float enemyWaitBeforeShootDuration;
     public float MaxcenemyWaitBeforeShootDuration;
+    public float highscore;
     #endregion
 
     #region MonoBehaviour Functions
@@ -113,6 +114,13 @@ public class GameManager : MonoBehaviour
             AddHealth();
         }
         PauseGame();
+        ScoreAPI.GetData((bool s, Data_RequestData d) => {
+            if (s)
+            {
+                highscore = d.high_score;
+            }
+        });
+        setHighScore(gamePlayhighscoreText);
     }
 
     // Update is called once per frame
@@ -318,23 +326,14 @@ public class GameManager : MonoBehaviour
 
     void setHighScore(TMP_Text highscroreTextUI)
     {
-        ScoreAPI.GetData((bool s, Data_RequestData d) => {
-            if (s)
-            {
-                if (score >= d.high_score)
-                {
-                    highscroreTextUI.text = score.ToString();
+        if (score >= highscore)
+        {
+            highscore = score;
 
-                }
-                else
-                {
-                    highscroreTextUI.text = d.high_score.ToString();
-                }
-
-            }
-        });
+        }
+        highscroreTextUI.text = highscore.ToString();
     }
-    
+
     void GetHighScore()
     {
         ScoreAPI.GetData((bool s, Data_RequestData d) => {
